@@ -15,6 +15,11 @@ const TIMESTAMP_BITS = 47;
 const INTERNALID_BITS = 5;
 const SEQUENCE_BITS = 12;
 
+const TIMESTAMP_END = 64 - TIMESTAMP_BITS;
+const INTERNALID_END = TIMESTAMP_END - INTERNALID_BITS;
+const INTERNALID_BITMASK = BigInt((2 ** INTERNALID_BITS - 1) << SEQUENCE_BITS);
+const SEQUENCE_BITMASK = BigInt(2 ** SEQUENCE_BITS - 1);
+
 export type snowflake = string;
 
 export class Snowflake {
@@ -54,34 +59,21 @@ interface SnowflakeData {
 }
 
 function convertSnowflakeDataToSnowflake(data: SnowflakeData): string {
-    const timestamp = (data.timestamp - SNOWFLAKE_EPOCH)
-        .toString(2)
-        .padStart(TIMESTAMP_BITS, '0');
-    const internalID = data.internalID
-        .toString(2)
-        .padStart(INTERNALID_BITS, '0');
-    const sequence = data.sequence.toString(2).padStart(SEQUENCE_BITS, '0');
+    let bigint = BigInt(0);
 
-    const binaryValue = '0b' + timestamp + internalID + sequence;
-
-    const bigint = BigInt(binaryValue);
+    bigint |= BigInt(data.timestamp - SNOWFLAKE_EPOCH) << BigInt(TIMESTAMP_END);
+    bigint |= BigInt(data.internalID << INTERNALID_END);
+    bigint |= BigInt(data.sequence);
 
     return bigint.toString(10);
 }
 
 function convertSnowflakeToSnowflakeData(snowflake: string): SnowflakeData {
     const bigint = BigInt(snowflake);
-    const binaryValue = bigint.toString(2).padStart(64, '0');
-    const timestamp =
-        parseInt(binaryValue.substr(0, TIMESTAMP_BITS), 2) + SNOWFLAKE_EPOCH;
-    const internalID = parseInt(
-        binaryValue.substr(TIMESTAMP_BITS, INTERNALID_BITS),
-        2,
-    );
-    const sequence = parseInt(
-        binaryValue.substr(TIMESTAMP_BITS + INTERNALID_BITS, SEQUENCE_BITS),
-        2,
-    );
+
+    const timestamp = Number(bigint >> 17n) + SNOWFLAKE_EPOCH;
+    const internalID = Number(bigint & INTERNALID_BITMASK) >> INTERNALID_END;
+    const sequence = Number(bigint & SEQUENCE_BITMASK);
 
     return {
         timestamp,
