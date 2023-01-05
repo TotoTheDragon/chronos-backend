@@ -81,3 +81,16 @@ function convertSnowflakeToSnowflakeData(snowflake: string): SnowflakeData {
         sequence,
     };
 }
+
+export function validateSnowflake(snowflake: string): boolean {
+    const bigint = BigInt(snowflake);
+
+    /*
+        Make sure that the snowflake contains a real timestamp
+    */
+    if (bigint >> 17n === 0n) {
+        return false;
+    }
+
+    return true;
+}
