@@ -1,3 +1,4 @@
+import './util/patches';
 import * as dotenv from 'dotenv';
 dotenv.config({ path: '/.env' });
 
