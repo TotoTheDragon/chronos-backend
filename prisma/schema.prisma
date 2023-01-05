@@ -2,10 +2,28 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Session {
+    id                  BigInt    @id
+    shift               BigInt?
+    user                BigInt
+    original_start_time DateTime
+    original_end_time   DateTime?
+    start_time          DateTime
+    end_time            DateTime?
+}
+
+model User {
+    id BigInt @id
+}
+
+model Shift {
+    id BigInt @id
 }
