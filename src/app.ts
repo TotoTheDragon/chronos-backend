@@ -5,8 +5,12 @@ import fastify, { FastifyServerOptions } from 'fastify';
 import { validateSnowflake } from './util/snowflake';
 import path from 'path';
 import autoload from '@fastify/autoload';
+import { PrismaClient } from '@prisma/client';
 
-export const build = (opts: FastifyServerOptions = {}) => {
+export const build = (
+    prisma: PrismaClient,
+    opts: FastifyServerOptions = {},
+) => {
     const app = fastify({
         ...opts,
         ajv: {
@@ -23,6 +27,8 @@ export const build = (opts: FastifyServerOptions = {}) => {
     app.register(autoload, {
         dir: path.join(__dirname, 'routes'),
     });
+
+    app.decorate('prisma', prisma);
 
     return app;
 };
