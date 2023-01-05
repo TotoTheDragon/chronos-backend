@@ -28,6 +28,10 @@ export const build = (
         dir: path.join(__dirname, 'routes'),
     });
 
+    app.register(autoload, {
+        dir: path.join(__dirname, 'plugins'),
+    });
+
     app.decorate('prisma', prisma);
 
     return app;
