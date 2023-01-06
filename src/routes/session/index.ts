@@ -59,10 +59,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async function (
         {
             schema: {
                 response: {
-                    201: {
-                        type: 'array',
-                        items: sessionSchema,
-                    },
+                    201: sessionSchema,
                 },
             },
         },
@@ -128,10 +125,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async function (
                     },
                 },
                 response: {
-                    200: {
-                        type: 'array',
-                        items: sessionSchema,
-                    },
+                    200: sessionSchema
                 },
             } as const,
         },
