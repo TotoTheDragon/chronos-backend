@@ -11,6 +11,7 @@
             "DOM"
         ],
         "outDir": "dist",
+        "baseUrl": "src",
         "strict": false,
         "strictFunctionTypes": false,
         "skipLibCheck": true,
