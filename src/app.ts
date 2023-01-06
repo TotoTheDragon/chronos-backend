@@ -3,7 +3,7 @@ import '@/util/patches';
 import * as dotenv from 'dotenv';
 dotenv.config({ path: '/.env' });
 
-import { validateSnowflake } from '@/util/snowflake';
+import { Snowflake, validateSnowflake } from '@/util/snowflake';
 import autoload from '@fastify/autoload';
 import { PrismaClient } from '@prisma/client';
 import fastify, { FastifyServerOptions } from 'fastify';
@@ -35,6 +35,7 @@ export const build = (
     });
 
     app.decorate('prisma', prisma);
+    app.decorate('snowflake', new Snowflake());
 
     return app;
 };
