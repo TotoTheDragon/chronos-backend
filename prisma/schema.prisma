@@ -18,6 +18,7 @@ model Session {
     original_end_time   DateTime?
     start_time          DateTime
     end_time            DateTime?
+    description         String?
 }
 
 model User {
