@@ -11,7 +11,10 @@
             "DOM"
         ],
         "outDir": "dist",
-        "baseUrl": "src",
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["./src/*"]
+        },
         "strict": false,
         "strictFunctionTypes": false,
         "skipLibCheck": true,
