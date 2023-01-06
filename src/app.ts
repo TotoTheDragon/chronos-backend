@@ -1,12 +1,13 @@
-import './util/patches';
+import 'module-alias/register';
+import '@/util/patches';
 import * as dotenv from 'dotenv';
 dotenv.config({ path: '/.env' });
 
-import fastify, { FastifyServerOptions } from 'fastify';
-import { validateSnowflake } from './util/snowflake';
-import path from 'path';
+import { validateSnowflake } from '@/util/snowflake';
 import autoload from '@fastify/autoload';
 import { PrismaClient } from '@prisma/client';
+import fastify, { FastifyServerOptions } from 'fastify';
+import path from 'path';
 
 export const build = (
     prisma: PrismaClient,
