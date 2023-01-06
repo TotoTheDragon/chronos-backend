@@ -1,7 +1,7 @@
 import { FastifyPluginAsync } from 'fastify';
 import fp from 'fastify-plugin';
-import { decode } from '../util/jwt';
-import { toBigInt } from '../util/util';
+import { decode } from '@/util/jwt';
+import { toBigInt } from '@/util/util';
 
 const plugin: FastifyPluginAsync = fp(async (instance, _options) => {
     // Initialize the request with a null value, to be changed in the prehandler
