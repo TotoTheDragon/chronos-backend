@@ -1,5 +1,6 @@
-import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
+import sessionSchema from '@/schemas/session';
 import { toBigInt } from '@/util/util';
+import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async function (
     instance,
@@ -18,6 +19,12 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async function (
                         before: { type: 'string', format: 'snowflake' },
                         after: { type: 'string', format: 'snowflake' },
                         limit: { type: 'number', minimum: 1, default: 25 },
+                    },
+                },
+                response: {
+                    200: {
+                        type: 'array',
+                        items: sessionSchema,
                     },
                 },
             } as const,
@@ -47,37 +54,53 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async function (
     /*
         Create session % HTTP POST /sessions
     */
-    instance.post('/', {}, async (req, reply) => {
-        if (req.user === undefined) {
-            return reply.status(401).send();
-        }
-
-        const userSession = await instance.prisma.session.findFirst({
-            take: -1,
-            where: {
-                user: req.user.id,
+    instance.post(
+        '/',
+        {
+            schema: {
+                response: {
+                    201: {
+                        type: 'array',
+                        items: sessionSchema,
+                    },
+                },
             },
-        });
+        },
+        async (req, reply) => {
+            if (req.user === undefined) {
+                return reply.status(401).send();
+            }
 
-        // If the user has a previous session, make sure that it has ended
-        if (userSession !== null && userSession.original_end_time === null) {
-            return reply.status(409).send();
-        }
+            const userSession = await instance.prisma.session.findFirst({
+                take: -1,
+                where: {
+                    user: req.user.id,
+                },
+            });
 
-        const id = instance.snowflake.generate();
-        const startTime = new Date();
+            // If the user has a previous session, make sure that it has ended
+            if (
+                userSession !== null &&
+                userSession.original_end_time === null
+            ) {
+                return reply.status(409).send();
+            }
 
-        const session = await instance.prisma.session.create({
-            data: {
-                id: id,
-                original_start_time: startTime,
-                start_time: startTime,
-                user: req.user.id,
-            },
-        });
+            const id = instance.snowflake.generate();
+            const startTime = new Date();
 
-        return reply.status(201).send(session);
-    });
+            const session = await instance.prisma.session.create({
+                data: {
+                    id: id,
+                    original_start_time: startTime,
+                    start_time: startTime,
+                    user: req.user.id,
+                },
+            });
+
+            return reply.status(201).send(session);
+        },
+    );
 
     /*
         Edit session % HTTP PATCH /sessions/{session.id}
@@ -102,6 +125,12 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async function (
                             type: 'string',
                             format: 'date-time',
                         },
+                    },
+                },
+                response: {
+                    200: {
+                        type: 'array',
+                        items: sessionSchema,
                     },
                 },
             } as const,
