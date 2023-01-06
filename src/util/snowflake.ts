@@ -20,8 +20,6 @@ const INTERNALID_END = TIMESTAMP_END - INTERNALID_BITS;
 const INTERNALID_BITMASK = BigInt((2 ** INTERNALID_BITS - 1) << SEQUENCE_BITS);
 const SEQUENCE_BITMASK = BigInt(2 ** SEQUENCE_BITS - 1);
 
-export type snowflake = string;
-
 export class Snowflake {
     sequence: number;
     internalID: number;
@@ -31,7 +29,7 @@ export class Snowflake {
         this.internalID = internalID;
     }
 
-    generate(): snowflake {
+    generate(): bigint {
         const id = convertSnowflakeDataToSnowflake({
             timestamp: Date.now(),
             internalID: this.internalID,
@@ -43,11 +41,11 @@ export class Snowflake {
         return id;
     }
 
-    deconstruct(snowflake: snowflake): SnowflakeData {
+    deconstruct(snowflake: string): SnowflakeData {
         return convertSnowflakeToSnowflakeData(snowflake);
     }
 
-    getDate(snowflake: snowflake): Date {
+    getDate(snowflake: string): Date {
         return new Date(this.deconstruct(snowflake).timestamp);
     }
 }
@@ -58,14 +56,14 @@ interface SnowflakeData {
     sequence: number;
 }
 
-function convertSnowflakeDataToSnowflake(data: SnowflakeData): string {
+function convertSnowflakeDataToSnowflake(data: SnowflakeData): bigint {
     let bigint = BigInt(0);
 
     bigint |= BigInt(data.timestamp - SNOWFLAKE_EPOCH) << BigInt(TIMESTAMP_END);
     bigint |= BigInt(data.internalID << INTERNALID_END);
     bigint |= BigInt(data.sequence);
 
-    return bigint.toString(10);
+    return bigint;
 }
 
 function convertSnowflakeToSnowflakeData(snowflake: string): SnowflakeData {
