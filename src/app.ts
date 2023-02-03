@@ -8,6 +8,7 @@ import autoload from '@fastify/autoload';
 import { PrismaClient } from '@prisma/client';
 import fastify, { FastifyServerOptions } from 'fastify';
 import path from 'path';
+import { Exporter } from "@/util/exporter/exporter";
 
 export const build = (
     prisma: PrismaClient,
@@ -25,7 +26,7 @@ export const build = (
             },
         },
     });
-    
+
     app.register(autoload, {
         dir: path.join(__dirname, 'plugins'),
     });
@@ -36,6 +37,7 @@ export const build = (
 
     app.decorate('prisma', prisma);
     app.decorate('snowflake', new Snowflake());
+    app.decorate('exporter', new Exporter());
 
     return app;
 };

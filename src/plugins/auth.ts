@@ -18,8 +18,8 @@ const plugin: FastifyPluginAsync = fp(async (instance, _options) => {
             // TODO remove this
         */
         if (req.headers.authorization.startsWith('Development ')) {
-            const id = toBigInt(req.headers.authorization.substring(12));
-            req.user = { id };
+            const id = toBigInt(req.headers.authorization.substring(13));
+            req.user = { id: id };
             return;
         }
 
@@ -31,6 +31,7 @@ const plugin: FastifyPluginAsync = fp(async (instance, _options) => {
         const jwt = req.headers.authorization.substring(7);
 
         const payload = decode(jwt);
+        console.log("test")
 
         req.user = {
             id: payload.id,
