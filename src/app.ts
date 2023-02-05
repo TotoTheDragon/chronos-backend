@@ -8,7 +8,7 @@ import autoload from '@fastify/autoload';
 import { PrismaClient } from '@prisma/client';
 import fastify, { FastifyServerOptions } from 'fastify';
 import path from 'path';
-import { Exporter } from "@/util/exporter/exporter";
+import { Exporter } from "@/exporter/exporter";
 
 export const build = (
     prisma: PrismaClient,

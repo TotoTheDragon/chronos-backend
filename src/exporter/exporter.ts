@@ -1,4 +1,4 @@
-import { XLSXExporter } from "@/util/exporter/PdfExporter";
+import { XLSXExporter } from "@/exporter/PdfExporter";
 import Session from "@/schemas/session";
 import { objectEnumValues } from "@prisma/client/runtime";
 import { AbstractExporter } from "./AbstractExporter";

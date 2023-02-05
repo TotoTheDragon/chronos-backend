@@ -1,4 +1,4 @@
-import { AbstractExporter } from "@/util/exporter/AbstractExporter";
+import { AbstractExporter } from "@/exporter/AbstractExporter";
 const XLSX = require('xlsx')
 
 export class XLSXExporter extends AbstractExporter {
