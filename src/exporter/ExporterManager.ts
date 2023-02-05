@@ -43,7 +43,6 @@ export class ExporterManager {
         options = options.filter((option) => ALLOWED_OPTIONS[option]);
 
         const filteredSessions = [];
-
         data.forEach((session) => {
             // create new session object with each attribute in options[] by taking the attribute from the session object or calculating it
             const filteredSession = {};
@@ -51,7 +50,7 @@ export class ExporterManager {
                 if (this.attributeConsumers.has(option)) {
                     filteredSession[option] = this.attributeConsumers
                         .get(option)
-                        .apply(session);
+                        .call(this, session);
                 } else {
                     filteredSession[option] = session[option];
                 }
@@ -67,7 +66,12 @@ export class ExporterManager {
         return null;
     }
 
-    calcHours(_session: Session) {
-        return null;
+    calcHours(session: Session) {
+        if (session.end_time === null) {
+            return 0;
+        }
+        const timeSpent =
+            session.end_time.getTime() - session.start_time.getTime();
+        return Math.floor(timeSpent / (1000 * 60 * 60));
     }
 }
