@@ -31,7 +31,6 @@ const plugin: FastifyPluginAsync = fp(async (instance, _options) => {
         const jwt = req.headers.authorization.substring(7);
 
         const payload = decode(jwt);
-        console.log("test")
 
         req.user = {
             id: payload.id,
