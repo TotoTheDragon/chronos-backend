@@ -4,5 +4,5 @@ export abstract class AbstractExporter {
     readonly fileType: string;
     readonly contentType: string;
     
-    abstract export(data: Session[]): any;
+    abstract export(data: Session[]): Buffer;
 }
