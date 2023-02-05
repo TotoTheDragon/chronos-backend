@@ -1,7 +1,6 @@
 import sessionSchema from '@/schemas/session';
 import { toBigInt } from '@/util/util';
 import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
-import { userInfo } from 'os';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async function (
     instance,
