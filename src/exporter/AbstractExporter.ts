@@ -1,5 +1,8 @@
-import Session from "@/schemas/session";
+import { Session } from "@prisma/client";
 
 export abstract class AbstractExporter {
-    abstract export(data: Array<object>): any;
+    readonly fileType: string;
+    readonly contentType: string;
+    
+    abstract export(data: Session[]): any;
 }

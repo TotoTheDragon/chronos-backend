@@ -75,7 +75,6 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async function (
                 },
             });
 
-
             // If the user has a previous session, make sure that it has ended
             if (
                 userSession !== null &&
@@ -123,13 +122,15 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async function (
             const session = await instance.prisma.session.findFirst({
                 take: -1,
                 where: {
-                    user: req.user.id
-                }
-            })
+                    user: req.user.id,
+                },
+            });
 
             //error if already ended
             if (session.original_end_time !== null) {
-                return reply.status(409).send({ error: "session was already ended" + session.id });
+                return reply
+                    .status(409)
+                    .send({ error: 'session was already ended' + session.id });
             }
 
             //end session and add description if given
@@ -139,12 +140,15 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async function (
                 },
                 data: {
                     original_end_time: new Date(),
-                    description: req.body !== undefined ? req.body.description : undefined,
-                }
-            })
+                    description:
+                        req.body !== undefined
+                            ? req.body.description
+                            : undefined,
+                },
+            });
             return reply.status(200).send(endedSession);
-        }
-    )
+        },
+    );
 
     /*
         Edit session % HTTP PATCH /sessions/{session.id}
@@ -172,7 +176,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async function (
                     },
                 },
                 response: {
-                    200: sessionSchema
+                    200: sessionSchema,
                 },
             } as const,
         },
@@ -228,6 +232,10 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async function (
             reply.status(200).send(patchedSession);
         },
     );
+
+    /*
+        Export sessions % HTTP POST /sessions/export
+    */
     instance.post(
         '/export',
         {
@@ -238,14 +246,19 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async function (
                         before: { type: 'string', format: 'snowflake' },
                         after: { type: 'string', format: 'snowflake' },
                         limit: { type: 'number', minimum: 1, default: 25 },
-                        fileType: { type: 'string', default: 'XLSX' },
+                        fileType: { type: 'string', default: 'xlsx' },
                     },
                 },
                 body: {
-                    type: 'object',
+                    type: ['object', 'null'],
                     properties: {
-                        options: { type: 'object' }
-                    }
+                        options: {
+                            type: 'array',
+                            items: {
+                                type: 'string',
+                            },
+                        },
+                    },
                 },
             } as const,
         },
@@ -253,6 +266,15 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async function (
             if (req.user === null) {
                 return reply.status(401).send();
             }
+
+            const exporter = instance.exporter.getExporter(req.query.fileType);
+
+            if (exporter === undefined) {
+                return reply
+                    .status(400)
+                    .send(new Error('Given file type is not supported'));
+            }
+
             const sessions = await instance.prisma.session.findMany({
                 take: req.query.limit,
                 where: {
@@ -266,15 +288,21 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async function (
                 },
             });
 
-            const options = req.body !== undefined ? req.body.options : undefined;
-            const exportObject = instance.exporter.export(sessions, req.query.fileType, options);
+            const filteredSessions = instance.exporter.filterSessionData(
+                sessions,
+                req.body?.options,
+            );
 
-            if (exportObject === null) {
-                return reply.status(400).send(new Error("Given file type is not supported"));
-            }
+            const buffer = exporter.export(filteredSessions);
 
-            return reply.status(200).headers(exportObject.headers).send(exportObject.file);
-        }
+            return reply
+                .status(200)
+                .headers({
+                    'Content-Type': exporter.contentType,
+                    'Content-Disposition': `attachment; filename=export.${exporter.fileType}`,
+                })
+                .send(buffer);
+        },
     );
 };
 

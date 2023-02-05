@@ -1,15 +1,13 @@
-
 declare global {
     import { Snowflake } from '@/util/snowflake';
     import { PrismaClient, User } from '@prisma/client';
+    import { ExporterManager } from '@/exporter/ExporterManager';
 
     module 'fastify' {
-        import {Exporter} from "@/util/exporter/exporter";
-
         interface FastifyInstance {
             prisma: PrismaClient;
             snowflake: Snowflake;
-            exporter: Exporter;
+            exporter: ExporterManager;
         }
         interface FastifyRequest {
             user: User;
