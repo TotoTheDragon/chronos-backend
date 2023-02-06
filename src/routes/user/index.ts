@@ -1,4 +1,10 @@
-import { decode, encode, encrypt } from '@/util/auth';
+import {
+    compare,
+    decode,
+    encode,
+    encrypt,
+    generateAuthTokens,
+} from '@/util/auth';
 import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async function (
@@ -129,6 +135,84 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async function (
             });
 
             reply.redirect(301, instance.server.address.toString());
+        },
+    );
+
+    /*
+        Login to account % HTTP POST /user/login
+    */
+    instance.post(
+        '/login',
+        {
+            schema: {
+                body: {
+                    type: 'object',
+                    properties: {
+                        email: { type: 'string' },
+                        password: { type: 'string' },
+                    },
+                },
+            } as const,
+        },
+        async (req, reply) => {
+            const user = await instance.prisma.user.findFirst({
+                where: { email: req.body.email },
+            });
+
+            if (user === null) {
+                reply.status(401).send();
+                return;
+            }
+
+            const correctPassword = compare(req.body.password, user.password);
+
+            if (!correctPassword) {
+                reply.status(401).send();
+                return;
+            }
+
+            /*
+                Login was succesful
+            */
+            const tokens = generateAuthTokens(user);
+
+            reply.status(200).send(tokens);
+        },
+    );
+
+    /*
+        Refresh access token % HTTP POST /user/refresh
+    */
+    instance.post(
+        '/refresh',
+        {
+            schema: {
+                body: {
+                    type: 'object',
+                    properties: {
+                        refresh_token: { type: 'string' },
+                    },
+                },
+            } as const,
+        },
+        async (req, reply) => {
+            const payload = await decode(req.body.refresh_token);
+
+            const user = await instance.prisma.user.findFirst({
+                where: { id: payload.id },
+            });
+
+            if (user === null) {
+                reply.status(401).send();
+                return;
+            }
+            
+            /*
+                Refresh token is correct and valid, send new tokens
+            */
+            const tokens = generateAuthTokens(user);
+
+            reply.status(200).send(tokens);
         },
     );
 };
