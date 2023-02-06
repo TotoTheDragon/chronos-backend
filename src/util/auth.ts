@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import { readFileSync } from 'fs';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { join } from 'path';
+import { User } from '@prisma/client';
 
 dotenv.config();
 
@@ -40,4 +41,28 @@ export function encrypt(password: string): string {
 
 export function compare(password: string, hash: string): boolean {
     return bcrypt.compareSync(password, hash);
+}
+
+export function generateAuthTokens(user: User): {
+    access_token: string;
+    refresh_token: string;
+} {
+    return {
+        access_token: encode(
+            {
+                id: user.id,
+                email: user.email,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                verified: user.verified,
+            },
+            process.env.ACCESS_TOKEN_EXPIRATION,
+        ),
+        refresh_token: encode(
+            {
+                id: user.id,
+            },
+            process.env.REFRESH_TOKEN_EXPIRATION,
+        )
+    }
 }
