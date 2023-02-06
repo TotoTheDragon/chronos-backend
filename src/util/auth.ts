@@ -1,10 +1,14 @@
 import dotenv from 'dotenv';
+import bcrypt from 'bcrypt';
 import { readFileSync } from 'fs';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { join } from 'path';
 
 dotenv.config();
 
+/*
+    jwt
+*/
 const jwtPath = join(__dirname, '../../jwt');
 export const privateKey = readFileSync(join(jwtPath, 'private.pem'));
 export const publicKey = readFileSync(join(jwtPath, 'public.pem'));
@@ -24,4 +28,16 @@ export function decode(token: string): JwtPayload {
     return jwt.verify(token, publicKey, {
         algorithms: ['RS256'],
     }) as JwtPayload;
+}
+/*
+    bcrypt
+*/
+const saltRounds = 10;
+
+export function encrypt(password: string): string {
+    return bcrypt.hashSync(password, saltRounds);
+}
+
+export function compare(password: string, hash: string): boolean {
+    return bcrypt.compareSync(password, hash);
 }
