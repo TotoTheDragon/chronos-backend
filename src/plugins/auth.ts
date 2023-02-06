@@ -1,6 +1,6 @@
 import { FastifyPluginAsync } from 'fastify';
 import fp from 'fastify-plugin';
-import { decode } from '@/util/jwt';
+import { decode } from '@/util/auth';
 import { toBigInt } from '@/util/util';
 
 const plugin: FastifyPluginAsync = fp(async (instance, _options) => {
