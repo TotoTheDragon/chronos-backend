@@ -26,6 +26,7 @@
         "@fastify/cors": "^8.2.0",
         "@fastify/type-provider-json-schema-to-ts": "^2.2.1",
         "@prisma/client": "^4.8.0",
+        "bcrypt": "^5.1.0",
         "dotenv": "^16.0.3",
         "fastify": "^4.10.2",
         "fastify-plugin": "^4.4.0",
