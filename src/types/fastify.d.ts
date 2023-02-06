@@ -1,6 +1,8 @@
+
 declare global {
+    import { APIUser } from './User';
     import { Snowflake } from '@/util/snowflake';
-    import { PrismaClient, User } from '@prisma/client';
+    import { PrismaClient } from '@prisma/client';
     import { ExporterManager } from '@/exporter/ExporterManager';
 
     module 'fastify' {
@@ -10,7 +12,7 @@ declare global {
             exporter: ExporterManager;
         }
         interface FastifyRequest {
-            user: User;
+            user: APIUser;
         }
     }
 }
