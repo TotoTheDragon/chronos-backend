@@ -18,7 +18,7 @@ const plugin: FastifyPluginAsync = fp(async (instance, _options) => {
             // TODO remove this
         */
         if (req.headers.authorization.startsWith('Development ')) {
-            const id = toBigInt(req.headers.authorization.substring(13));
+            const id = toBigInt(req.headers.authorization.substring(12));
             req.user = { id: id };
             return;
         }
@@ -34,6 +34,10 @@ const plugin: FastifyPluginAsync = fp(async (instance, _options) => {
 
         req.user = {
             id: payload.id,
+            email: payload.email,
+            verified: payload.verified,
+            first_name: payload.first_name,
+            last_name: payload.last_name,
         };
     });
 });
