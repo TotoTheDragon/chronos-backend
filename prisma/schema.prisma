@@ -22,7 +22,13 @@ model Session {
 }
 
 model User {
-    id BigInt @id
+    id                 BigInt  @id
+    email              String
+    first_name         String
+    last_name          String
+    verified           Boolean @default(false)
+    password           String
+    verification_token String?
 }
 
 model Shift {
