@@ -28,7 +28,6 @@ model User {
     last_name          String
     verified           Boolean @default(false)
     password           String
-    verification_token String?
 }
 
 model Shift {
